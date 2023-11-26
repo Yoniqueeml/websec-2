@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Расписание занятий</title>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 20px;
+    }
+
+    h2 {
+        color: #333;
+    }
+
+    form {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    select, input[type="submit"], button {
+        padding: 8px;
+        margin: 5px;
+    }
+
+    button {
+        cursor: pointer;
+    }
+
+    #differenceOutput {
+        margin-bottom: 20px;
+        font-weight: bold;
+        color: #00f; /* Синий цвет для выделения */
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    th, td {
+        border: 1px solid #00f;
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    /* Добавим немного отступа и цвета для четных и нечетных строк таблицы */
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:nth-child(odd) {
+        background-color: #e6e6e6;
+    }
+
+    /* Стили для кнопок изменения недели */
+    #changeWeekForm button {
+        background-color: #4CAF50; /* Зеленый цвет для выделения */
+        color: white;
+        padding: 8px;
+        margin: 5px;
+        border: none;
+        cursor: pointer;
+        border-radius: 3px;
+    }
+
+    #changeWeekForm button:hover {
+        background-color: #45a049; /* Темно-зеленый цвет при наведении */
+    }
+</style>
+</head>
+<body>
+
+<h2>Расписание занятий</h2>
+<div id="differenceOutput"></div>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="group_select">Select Group:</label>
+    <select name="group_select" id="group_select">
+        {% for group_id, group_url in groups.items %}
+        <option value="{{ group_id }}" {% if group_id == current_group %}selected{% endif %}>{{ group_id }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Change Group">
+</form>
+<form method="post" id="changeWeekForm">
+    {% csrf_token %}
+    <input type="hidden" name="group_select" value="{{ current_group }}">
+    <input type="hidden" name="week_offset" id="weekOffset" value="0">
+    <button type="button" onclick="changeWeek(-1)">Previous Week</button>
+    <button type="button" onclick="changeWeek(1)">Next Week</button>
+</form>
+<table>
+    <tr>
+        <th>Time</th>
+        {% for day, entries in schedule.items %}
+        <th>{{ day }}</th>
+        {% endfor %}
+    </tr>
+
+    {% for time_slot in time_slots %}
+    <tr>
+        <td>{{ time_slot }}</td>
+        {% for day, entries in schedule.items %}
+        {% for entry in entries %}
+        {% if entry.time == time_slot %}
+        <td>
+            {{ entry.discipline }}<br>
+            {{ entry.place }}<br>
+            {{ entry.teacher }}<br>
+            {{ entry.groups|join:", " }}
+        </td>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
+
+<script>
+    var storedWeekOffset = localStorage.getItem('weekOffset');
+    if (storedWeekOffset !== null) {
+        document.getElementById('weekOffset').value = storedWeekOffset;
+    }
+    var curr_week = {{ curr_week }}
+    var weekOffsetInput = document.getElementById('weekOffset');
+    var difference = curr_week + parseInt(weekOffsetInput.value);
+    function changeWeek(offset) {
+        console.log(curr_week)
+        console.log(offset)
+        var weekOffsetInput = document.getElementById('weekOffset');
+        console.log(parseInt(weekOffsetInput.value))
+        if (curr_week + offset + parseInt(weekOffsetInput.value)  >= 0) {
+            weekOffsetInput.value = parseInt(weekOffsetInput.value) + offset;
+            console.log(weekOffsetInput.value)
+            localStorage.setItem('weekOffset', weekOffsetInput.value);
+
+            document.getElementById('changeWeekForm').submit();
+        }
+    }
+    document.getElementById('differenceOutput').innerText = 'Неделя: ' + difference;
+</script>
