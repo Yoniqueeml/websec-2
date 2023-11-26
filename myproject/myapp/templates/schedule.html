@@ -36,7 +36,7 @@
     #differenceOutput {
         margin-bottom: 20px;
         font-weight: bold;
-        color: #00f; /* Синий цвет для выделения */
+        color: #00f;
     }
 
     table {
@@ -56,7 +56,6 @@
         font-weight: bold;
     }
 
-    /* Добавим немного отступа и цвета для четных и нечетных строк таблицы */
     tr:nth-child(even) {
         background-color: #f9f9f9;
     }
@@ -65,9 +64,8 @@
         background-color: #e6e6e6;
     }
 
-    /* Стили для кнопок изменения недели */
     #changeWeekForm button {
-        background-color: #4CAF50; /* Зеленый цвет для выделения */
+        background-color: #4CAF50;
         color: white;
         padding: 8px;
         margin: 5px;
@@ -77,7 +75,7 @@
     }
 
     #changeWeekForm button:hover {
-        background-color: #45a049; /* Темно-зеленый цвет при наведении */
+        background-color: #45a049;
     }
 </style>
 </head>
@@ -142,13 +140,9 @@
     var weekOffsetInput = document.getElementById('weekOffset');
     var difference = curr_week + parseInt(weekOffsetInput.value);
     function changeWeek(offset) {
-        console.log(curr_week)
-        console.log(offset)
         var weekOffsetInput = document.getElementById('weekOffset');
-        console.log(parseInt(weekOffsetInput.value))
         if (curr_week + offset + parseInt(weekOffsetInput.value)  >= 0) {
             weekOffsetInput.value = parseInt(weekOffsetInput.value) + offset;
-            console.log(weekOffsetInput.value)
             localStorage.setItem('weekOffset', weekOffsetInput.value);
 
             document.getElementById('changeWeekForm').submit();

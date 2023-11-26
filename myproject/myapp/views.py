@@ -56,9 +56,6 @@ def parse(html_code):
                 'groups': groups
             })
 
-    # for key, value in schedule_data.items():
-    #    print(f"{key}: {value}")
-
     return schedule_data
 
 
