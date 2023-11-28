@@ -4,7 +4,7 @@
 ![](/preview.png) 
 1. Качаем архив
 2. Переходим в папку websec-2-main и открываем папку с помощью pycharm  <br/> 
-3. Настриваем интерпретатор <br/>
+3. Настраиваем интерпретатор <br/>
 4. В терминале устанавливаем пакет bs4, django, requests (pip install bs4 итд) <br/>
 5. В терминале пишем cd .\myproject\ <br/>
 6. Потом python manage.py runserver <br/>
