@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="styles.css">
     <title>Расписание занятий</title>
-<style>
+    <style>
     body {
         font-family: 'Arial', sans-serif;
         margin: 20px;
@@ -77,7 +76,37 @@
     #changeWeekForm button:hover {
         background-color: #45a049;
     }
-</style>
+@media only screen and (max-width: 600px) {
+    body {
+        margin: 5px;
+        font-size: 0.8em;
+    }
+
+    h2 {
+        font-size: 1.2em;
+    }
+
+    form {
+        margin-bottom: 5px;
+    }
+
+    label {
+        font-size: 0.8em;
+        margin-right: 3px;
+    }
+
+    select, input[type="submit"], button {
+        padding: 3px;
+        margin: 2px;
+        font-size: 0.8em;
+    }
+
+    table {
+        font-size: 0.8em;
+    }
+}
+
+    </style>
 </head>
 <body>
 
@@ -86,20 +115,22 @@
 
 <form method="post">
     {% csrf_token %}
-    <label for="group_select">Select Group:</label>
-    <select name="group_select" id="group_select">
-        {% for group_id, group_url in groups.items %}
-        <option value="{{ group_id }}" {% if group_id == current_group %}selected{% endif %}>{{ group_id }}</option>
-        {% endfor %}
-    </select>
-    <input type="submit" value="Change Group">
+    <label for="data_select">Enter Group:</label>
+    <input list="data_list" type="text" name="data_select" id="data_select" value="{{ current_data }}"
+           autocomplete="off">
+    <datalist id="data_list">
+        {% for data in all_data %}
+        <option value="{{ data }}">
+            {% endfor %}
+    </datalist>
+    <input type="submit" value="Change Filter">
 </form>
 <form method="post" id="changeWeekForm">
     {% csrf_token %}
     <input type="hidden" name="group_select" value="{{ current_group }}">
     <input type="hidden" name="week_offset" id="weekOffset" value="0">
-    <button type="button" onclick="changeWeek(-1)">Previous Week</button>
-    <button type="button" onclick="changeWeek(1)">Next Week</button>
+    <button type="submit" onclick="changeWeek(-1)">Previous Week</button>
+    <button type="submit" onclick="changeWeek(1)">Next Week</button>
 </form>
 <table>
     <tr>
@@ -132,21 +163,47 @@
 </html>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var storedDataSelect = localStorage.getItem('dataSelect');
+        if (storedDataSelect !== null) {
+            document.getElementById('data_select').value = storedDataSelect;
+        }
+    });
+
+    document.getElementById('data_select').addEventListener('input', function() {
+        var dataSelectValue = this.value;
+        localStorage.setItem('dataSelect', dataSelectValue);
+    });
+
     var storedWeekOffset = localStorage.getItem('weekOffset');
     if (storedWeekOffset !== null) {
         document.getElementById('weekOffset').value = storedWeekOffset;
     }
-    var curr_week = {{ curr_week }}
+
+    var curr_week = {{ curr_week }};
     var weekOffsetInput = document.getElementById('weekOffset');
     var difference = curr_week + parseInt(weekOffsetInput.value);
+
     function changeWeek(offset) {
         var weekOffsetInput = document.getElementById('weekOffset');
         if (curr_week + offset + parseInt(weekOffsetInput.value)  >= 0) {
             weekOffsetInput.value = parseInt(weekOffsetInput.value) + offset;
             localStorage.setItem('weekOffset', weekOffsetInput.value);
-
             document.getElementById('changeWeekForm').submit();
         }
     }
+
+    document.getElementById('changeWeekForm').addEventListener('submit', function() {
+        var storedDataSelect = localStorage.getItem('dataSelect');
+        if (storedDataSelect !== null) {
+            var hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'data_select';
+            hiddenInput.value = storedDataSelect;
+            this.appendChild(hiddenInput);
+        }
+    });
+
     document.getElementById('differenceOutput').innerText = 'Неделя: ' + difference;
+
 </script>
